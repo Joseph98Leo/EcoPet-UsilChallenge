@@ -1,0 +1,28 @@
+# Unity generated
+Library/
+Temp/
+Obj/
+Logs/
+UserSettings/
+MemoryCaptures/
+.utmp/
+
+# Build output
+Build/
+Builds/
+
+# VS / Rider
+.vs/
+.idea/
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+
+# Claude Code
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db

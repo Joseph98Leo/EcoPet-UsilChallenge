@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/SplashScene.unity
+    guid: 478b04fbe8091469bbd92f276d81c13d
+  - enabled: 1
+    path: Assets/Scenes/SeleccionScene.unity
+    guid: c88852ed4133e46eba1adff706c0b05b
+  - enabled: 1
+    path: Assets/Scenes/SampleScene.unity
+    guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 1
+    path: Assets/Scenes/MapaScene.unity
+    guid: f69c2cbfe208d45f9b773a73ee8fde62
+  - enabled: 1
+    path: Assets/Scenes/QuizScene.unity
+    guid: 3d801c46eadbb4bdf874ae53cd66bda9
+  m_configObjects:
+    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

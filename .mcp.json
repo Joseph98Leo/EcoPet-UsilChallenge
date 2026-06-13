@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "unity-mcp": {
+      "command": "/Users/jleo/.unity/relay/relay_mac_arm64.app/Contents/MacOS/relay_mac_arm64",
+      "args": ["--mcp", "--project-path", "/Users/jleo/Desktop/Usil/2026-1/unity/EcoPet"]
+    }
+  }
+}
