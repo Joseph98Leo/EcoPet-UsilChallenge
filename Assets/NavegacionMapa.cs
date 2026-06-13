@@ -1,6 +1,5 @@
 using System.Collections; // ¡Librería obligatoria para las Corrutinas!
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class NavegacionMapa : MonoBehaviour
@@ -58,11 +57,11 @@ public class NavegacionMapa : MonoBehaviour
 
     public void VolverAMascota()
     {
-        SceneManager.LoadScene("SampleScene"); 
+        GameSceneManager.LoadScene("SampleScene");
     }
 
     public void IrAlQuiz()
     {
-        SceneManager.LoadScene("QuizScene"); 
+        GameSceneManager.LoadScene("QuizScene");
     }
 }

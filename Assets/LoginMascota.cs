@@ -2,7 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.SceneManagement;
 
 public class LoginMascota : MonoBehaviour
 {
@@ -204,7 +203,7 @@ public class LoginMascota : MonoBehaviour
     public void IrAlMapa()
     {
         GuardarEstado();
-        SceneManager.LoadScene("MapaScene");
+        GameSceneManager.LoadScene("MapaScene");
     }
 
     // ─── Animación ─────────────────────────────────────────────────────────

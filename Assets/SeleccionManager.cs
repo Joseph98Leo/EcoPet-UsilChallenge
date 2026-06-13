@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class SeleccionManager : MonoBehaviour
 {
@@ -13,6 +12,6 @@ public class SeleccionManager : MonoBehaviour
         PlayerPrefs.SetInt("PersonajeSeleccionado", id);
         PlayerPrefs.Save();
 
-        SceneManager.LoadScene("SampleScene"); 
+        GameSceneManager.LoadScene("SampleScene");
     }
 }

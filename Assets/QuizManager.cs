@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using TMPro;
 
 [System.Serializable]
@@ -211,9 +210,9 @@ public class QuizManager : MonoBehaviour
 
     // ─── Navegación ───────────────────────────────────────────────────────
 
-    public void VolverAlMapa()     { SceneManager.LoadScene("MapaScene");    }
-    public void VolverAMascota()   { SceneManager.LoadScene("SampleScene");  }
-    public void ReiniciarQuiz()    { SceneManager.LoadScene("QuizScene");    }
+    public void VolverAlMapa()     { GameSceneManager.LoadScene("MapaScene");    }
+    public void VolverAMascota()   { GameSceneManager.LoadScene("SampleScene");  }
+    public void ReiniciarQuiz()    { GameSceneManager.LoadScene("QuizScene");    }
 
     public void RespuestaCorrecta()   => Responder(preguntas[idx].indiceCorrecto);
     public void RespuestaIncorrecta() => Responder((preguntas[idx].indiceCorrecto + 1) % 4);

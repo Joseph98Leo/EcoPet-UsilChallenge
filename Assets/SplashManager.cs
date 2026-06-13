@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class SplashManager : MonoBehaviour
 {
@@ -14,7 +13,7 @@ public class SplashManager : MonoBehaviour
     IEnumerator CambiarPantalla()
     {
         yield return new WaitForSeconds(tiempoDeEspera);
-        
-        SceneManager.LoadScene("SeleccionScene"); 
+
+        GameSceneManager.LoadScene("SeleccionScene");
     }
 }
