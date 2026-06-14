@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -14,13 +15,18 @@ public class Pregunta
 
 public class QuizManager : MonoBehaviour
 {
+    private const int   CantidadPreguntas          = 3;
+    private const float DuracionFeedbackIncorrecto = 1.5f;
+    private const float DuracionParpadeo           = 0.5f;
+    private const int   RepeticionesParpadeo       = 3;
+    private const float EsperaRegreso              = 2f;
+
     // ─── Preguntas ─────────────────────────────────────────────────────────
     [Header("Banco de preguntas")]
     public Pregunta[] preguntas;
 
     // ─── UI ───────────────────────────────────────────────────────────────
     [Header("UI - Cabecera")]
-    public TextMeshProUGUI textoEcoPoints;
     public TextMeshProUGUI textoProgreso;
 
     [Header("UI - Barra de progreso")]
@@ -42,11 +48,15 @@ public class QuizManager : MonoBehaviour
     public TextMeshProUGUI textoFeedback;
     public UnityEngine.UI.Image  bgFeedback;
 
-    [Header("UI - Resultado final")]
-    public GameObject panelResultado;
-    public TextMeshProUGUI textoResultadoTitulo;
-    public TextMeshProUGUI textoResultadoDetalle;
-    public TextMeshProUGUI textoGanados;
+    [Header("Mascota")]
+    public UnityEngine.UI.Image imagenMascota;
+    public Sprite[] listaNormal;
+    public Sprite[] listaFeliz;
+
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip sonidoCorrecto;
+    public AudioClip sonidoIncorrecto;
 
     // ─── Colores ──────────────────────────────────────────────────────────
     static readonly Color ColNormal     = new Color(0.97f, 0.97f, 0.97f);
@@ -60,33 +70,57 @@ public class QuizManager : MonoBehaviour
     static readonly Color ColWriting   = new Color(0.92f, 0.55f, 0.12f);
 
     // ─── Estado ───────────────────────────────────────────────────────────
-    int  idx          = 0;
-    int  correctas    = 0;
-    int  puntosGanados = 0;
-    bool respondido   = false;
+    Pregunta[] preguntasSesion;
+    int  idSeleccionado;
+    int  idx        = 0;
+    bool respondido = false;
 
     // ─── Ciclo de vida ────────────────────────────────────────────────────
 
+    void Awake()
+    {
+        if (audioSource == null) audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+    }
+
     void Start()
     {
-        if (panelResultado != null) panelResultado.SetActive(false);
-        if (panelFeedback  != null) panelFeedback.SetActive(false);
-        ActualizarEcoPoints();
+        idSeleccionado  = PlayerPrefs.GetInt("ActualPet", 0);
+        preguntasSesion = SeleccionarPreguntasAleatorias(CantidadPreguntas);
+
+        if (panelFeedback != null) panelFeedback.SetActive(false);
+
         MostrarPregunta();
     }
 
     // ─── Lógica principal ─────────────────────────────────────────────────
 
+    Pregunta[] SeleccionarPreguntasAleatorias(int cantidad)
+    {
+        List<Pregunta> disponibles = new List<Pregunta>(preguntas);
+        List<Pregunta> seleccion = new List<Pregunta>();
+
+        cantidad = Mathf.Min(cantidad, disponibles.Count);
+        for (int i = 0; i < cantidad; i++)
+        {
+            int elegido = Random.Range(0, disponibles.Count);
+            seleccion.Add(disponibles[elegido]);
+            disponibles.RemoveAt(elegido);
+        }
+        return seleccion.ToArray();
+    }
+
     void MostrarPregunta()
     {
-        if (idx >= preguntas.Length) { MostrarResultado(); return; }
-
         respondido = false;
-        var p = preguntas[idx];
+        var p = preguntasSesion[idx];
+
+        MostrarSprite(listaNormal);
 
         // Progreso
-        if (textoProgreso  != null) textoProgreso.text = (idx + 1) + " / " + preguntas.Length;
-        if (fillProgreso   != null) fillProgreso.fillAmount = (float)(idx) / preguntas.Length;
+        if (textoProgreso  != null) textoProgreso.text = (idx + 1) + " / " + preguntasSesion.Length;
+        if (fillProgreso   != null) fillProgreso.fillAmount = (float)idx / preguntasSesion.Length;
 
         // Categoría
         if (textoCategoria != null)
@@ -117,7 +151,7 @@ public class QuizManager : MonoBehaviour
         if (respondido) return;
         respondido = true;
 
-        var p = preguntas[idx];
+        var p = preguntasSesion[idx];
         bool correcto = opcionIdx == p.indiceCorrecto;
 
         // Desactivar botones
@@ -139,21 +173,20 @@ public class QuizManager : MonoBehaviour
         // Feedback banner
         if (correcto)
         {
-            correctas++;
-            puntosGanados += 10;
-
             float felicidad = PlayerPrefs.GetFloat("MiFelicidad", 100f);
             felicidad = Mathf.Min(felicidad + 15f, 100f);
             PlayerPrefs.SetFloat("MiFelicidad", felicidad);
 
-            MostrarFeedback(true, "¡Correcto! +10 EP  +15 Felicidad");
+            ReproducirSonido(sonidoCorrecto);
+            MostrarFeedback(true, "¡Correcto! +15 Felicidad");
         }
         else
         {
+            ReproducirSonido(sonidoIncorrecto);
             MostrarFeedback(false, "¡Casi! La respuesta era: " + p.opciones[p.indiceCorrecto]);
         }
 
-        StartCoroutine(EsperarYSiguiente(1.8f));
+        StartCoroutine(ProcesarSiguiente(correcto));
     }
 
     void MostrarFeedback(bool ok, string msg)
@@ -164,58 +197,54 @@ public class QuizManager : MonoBehaviour
         if (bgFeedback    != null) bgFeedback.color   = ok ? ColCorrecto : ColIncorrecto;
     }
 
-    IEnumerator EsperarYSiguiente(float seg)
+    IEnumerator ProcesarSiguiente(bool correcto)
     {
-        yield return new WaitForSeconds(seg);
-        idx++;
-        MostrarPregunta();
-        ActualizarEcoPoints();
-    }
-
-    void MostrarResultado()
-    {
-        // Guardar puntos ganados
-        int pts = PlayerPrefs.GetInt("MisEcoPoints", 50) + puntosGanados;
-        PlayerPrefs.SetInt("MisEcoPoints", pts);
-
-        if (correctas >= preguntas.Length / 2)
+        if (correcto)
         {
-            int nivel = PlayerPrefs.GetInt("NivelDesbloqueado", 1);
-            if (nivel == 1)
+            for (int i = 0; i < RepeticionesParpadeo; i++)
             {
-                PlayerPrefs.SetInt("NivelDesbloqueado", 2);
-                PlayerPrefs.SetInt("AnimarNuevoNivel",  1);
+                MostrarSprite(listaFeliz);
+                yield return new WaitForSeconds(DuracionParpadeo);
+                MostrarSprite(listaNormal);
+                yield return new WaitForSeconds(DuracionParpadeo);
             }
+            MostrarSprite(listaFeliz);
         }
-        PlayerPrefs.Save();
+        else
+        {
+            yield return new WaitForSeconds(DuracionFeedbackIncorrecto);
+        }
 
-        if (panelFeedback  != null) panelFeedback.SetActive(false);
-        if (panelResultado != null) panelResultado.SetActive(true);
+        idx++;
 
-        string titulo  = correctas >= preguntas.Length * 0.8f ? "¡Excelente!" :
-                         correctas >= preguntas.Length * 0.5f ? "¡Buen trabajo!" : "¡Sigue intentando!";
-        int felicidadGanada = correctas * 15;
-        if (textoResultadoTitulo  != null) textoResultadoTitulo.text  = titulo;
-        if (textoResultadoDetalle != null) textoResultadoDetalle.text = correctas + " / " + preguntas.Length + " correctas";
-        if (textoGanados          != null) textoGanados.text          = "+" + puntosGanados + " EcoPoints  •  +" + felicidadGanada + " Felicidad";
-
-        ActualizarEcoPoints();
+        if (idx >= preguntasSesion.Length)
+        {
+            yield return new WaitForSeconds(EsperaRegreso);
+            GameSceneManager.LoadScene("SampleScene");
+        }
+        else
+        {
+            MostrarPregunta();
+        }
     }
 
-    void ActualizarEcoPoints()
+    void MostrarSprite(Sprite[] lista)
     {
-        if (textoEcoPoints != null)
-            textoEcoPoints.text = PlayerPrefs.GetInt("MisEcoPoints", 50).ToString();
+        if (imagenMascota == null || lista == null) return;
+        if (idSeleccionado >= 0 && idSeleccionado < lista.Length && lista[idSeleccionado] != null)
+            imagenMascota.sprite = lista[idSeleccionado];
+    }
+
+    void ReproducirSonido(AudioClip clip)
+    {
+        if (clip == null || audioSource == null) return;
+        audioSource.PlayOneShot(clip);
     }
 
     // ─── Navegación ───────────────────────────────────────────────────────
 
-    public void VolverAlMapa()     { GameSceneManager.LoadScene("MapaScene");    }
-    public void VolverAMascota()   { GameSceneManager.LoadScene("SampleScene");  }
-    public void ReiniciarQuiz()    { GameSceneManager.LoadScene("QuizScene");    }
-
-    public void RespuestaCorrecta()   => Responder(preguntas[idx].indiceCorrecto);
-    public void RespuestaIncorrecta() => Responder((preguntas[idx].indiceCorrecto + 1) % 4);
+    public void VolverAlMapa()   { GameSceneManager.LoadScene("MapaScene");   }
+    public void VolverAMascota() { GameSceneManager.LoadScene("SampleScene"); }
 
     // ─── Util ─────────────────────────────────────────────────────────────
 

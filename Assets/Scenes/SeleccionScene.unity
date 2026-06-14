@@ -7424,11 +7424,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Hola, soy Nilo. Vivo en las costas rocosas del Per\xFA. El oc\xE9ano que
+  m_text: "Hola, soy Yaku. Vivo en las costas rocosas del Per\xFA. El oc\xE9ano que
     era mi hogar est\xE1 lleno de basura y los peces que como est\xE1n desapareciendo.
     El petr\xF3leo derramado manch\xF3 mis plumas y ahora no puedo nadar bien ni
     mantenerme caliente. \xBFMe ayudas a limpiarme y recuperarme?\r\n\r\nHi, I'm
-    Nilo. I live on the rocky coasts of Peru. The ocean that was my home is full
+    Yaku. I live on the rocky coasts of Peru. The ocean that was my home is full
     of garbage and the fish I eat are disappearing. Spilled oil stained my feathers
     and now I can't swim well or stay warm. Will you help me clean up and recover?"
   m_isRightToLeft: 0
@@ -7457,7 +7457,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 34.65
+  m_fontSize: 34.45
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1

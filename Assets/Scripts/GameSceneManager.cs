@@ -36,7 +36,7 @@ public class GameSceneManager : MonoBehaviour
 
     public static void LoadScene(string sceneName)
     {
-        LoadScene(sceneName, TransitionEffectType.WaterWave, 1f, Color.white);
+        LoadScene(sceneName, TransitionEffectType.Stripes, 1f, Color.black);
     }
 
     public static void LoadScene(string sceneName, TransitionEffectType effect, float duration, Color color)
